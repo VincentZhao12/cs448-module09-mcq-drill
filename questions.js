@@ -3,8 +3,8 @@
 
   const banks = [
     {
-      module: "09-01 Query Processing Algorithms",
-      source: "slides 1-49",
+      module: "Query Processing Algorithms",
+      source: "Query Processing Algorithms",
       facts: [
         ["External sorting", "Two-way merge sort needs at least three buffer pages: two input buffers and one output buffer.", "Treating disk sorting as n log n tuple work instead of I/O over N pages", "Hard"],
         ["External sorting", "Each full external-sort pass costs 2N I/Os because it reads and writes the whole relation.", "Counting only reads and forgetting writes in every pass", "Hard"],
@@ -32,15 +32,15 @@
         ["Join algorithms", "Tuple-oriented nested loops with r outer costs Nr + |r|*Ns.", "Using Nr + Nr*Ns, which is page-oriented NLJ", "Hard"],
         ["Join algorithms", "Page-oriented nested loops with r outer costs Nr + Nr*Ns.", "Using tuple count for the outer in page-oriented NLJ", "Hard"],
         ["Join algorithms", "Block nested loops with r outer and block size B costs Nr + ceil(Nr/B)*Ns.", "Dividing the inner relation by B instead of the outer relation", "Hard"],
-        ["Join algorithms", "Indexed nested loops with r outer and an inner tree index costs Nr + |r|*logF(Ns) in the simplified slide model.", "Building the index on the outer relation for each inner tuple", "Hard"],
+        ["Join algorithms", "Indexed nested loops with r outer and an inner tree index costs Nr + |r|*logF(Ns) in the simplified cost model.", "Building the index on the outer relation for each inner tuple", "Hard"],
         ["Join algorithms", "Sort-merge join sorts both relations on join attributes, then merges equal groups.", "Assuming it applies cleanly to arbitrary theta predicates", "Hard"],
         ["Join algorithms", "Hash join partitions both tables on the join attributes using the same hash function.", "Hashing only the smaller table and never partitioning the larger one when both exceed memory", "Medium"],
         ["Theta joins", "General theta joins use nested loops; inequalities may use indexed nested loops, but hash and sort-merge are mainly for equijoins.", "Using hash join for r.a < s.b", "Hard"]
       ]
     },
     {
-      module: "09-02 Query Evaluation Pipelines",
-      source: "slides 1-126",
+      module: "Query Evaluation Pipelines",
+      source: "Query Evaluation Pipelines",
       facts: [
         ["SQL to RA", "Conceptual SQL evaluation maps FROM tables to a cross product, WHERE predicates to selection, and SELECT attributes to projection.", "Pushing projection before selection even when predicates need projected-away attributes", "Medium"],
         ["QEP pipeline", "The processing path is parser/rewrite, optimizer, physical QEP, then query processor execution.", "Treating a logical relational algebra tree as already choosing physical algorithms", "Medium"],
@@ -61,12 +61,12 @@
         ["SIMD", "SIMD such as AVX operates on multiple data values in one instruction, complementing vectorized processing.", "Equating SIMD with multithreading transactions", "Medium"],
         ["Physical operators", "Index-only plans can use IndexScan when required attributes are available from the index.", "Fetching data pages even when the index covers the needed attributes", "Hard"],
         ["Physical operators", "Create-index and bulk-load are physical operators/actions in the broader execution toolbox.", "Restricting physical operators only to relational algebra symbols", "Medium"],
-        ["Left vs right", "Left-deep plans avoid rereading intermediate right subtrees in the slide comparison.", "Saying right-deep is identical because joins are associative", "Hard"]
+        ["Left vs right", "Left-deep plans avoid rereading intermediate right subtrees in the iterator execution comparison.", "Saying right-deep is identical because joins are associative", "Hard"]
       ]
     },
     {
-      module: "10 Query Optimization",
-      source: "slides 1-36",
+      module: "Query Optimization",
+      source: "Query Optimization",
       facts: [
         ["Algebraic transforms", "A selection over a cross product can become a join when the predicate links the relations.", "Leaving sigma(r x s) as a literal cross product even for join predicates", "Medium"],
         ["Algebraic transforms", "Join is commutative and associative for inner joins, enabling join reordering.", "Applying the same freedom to outer joins without checking semantics", "Hard"],
@@ -84,15 +84,15 @@
         ["Histograms", "Histograms improve range selectivity by summing bucket contributions.", "Using only global min/max when skew is known by histogram", "Hard"],
         ["Join selectivity", "Many-to-many equijoin selectivity is based on max(distinct values in r, distinct values in s).", "Dividing by min distinct values and overestimating", "Hard"],
         ["PK/FK join", "A foreign-key/primary-key many-to-one join has output roughly the referencing relation size when referential integrity holds.", "Multiplying both table sizes as the final output", "Hard"],
-        ["Heuristics", "High selectivity in the slide wording means a strong reduction factor, so do highly filtering operations early.", "Postponing filters until after joins for no reason", "Medium"],
+        ["Heuristics", "Highly filtering operations should usually be done early because they shrink later inputs.", "Postponing filters until after joins for no reason", "Medium"],
         ["Multi-table plans", "Left-deep dynamic programming keeps cheapest subplans for subsets and extends them pass by pass.", "Building only one greedy order and calling it exhaustive optimization", "Hard"],
         ["Interesting orders", "A plan with a useful output ordering may be kept even if not currently cheapest.", "Discarding all non-cheapest plans and losing sort-merge/order-by benefits", "Hard"],
         ["Group-by pushdown", "Pushing group-by below a join can help when it shrinks data without changing semantics.", "Pushing every group-by below every join blindly", "Hard"]
       ]
     },
     {
-      module: "11 Transaction Management",
-      source: "slides 1-26",
+      module: "Transaction Management",
+      source: "Transaction Management",
       facts: [
         ["Transactions", "A transaction is a sequence of steps that takes the database from one consistent state to another if run alone.", "Treating each individual read or write as a full transaction", "Easy"],
         ["ACID", "Atomicity means all actions happen or none happen.", "Confusing atomicity with isolation from other transactions", "Medium"],
@@ -113,8 +113,8 @@
       ]
     },
     {
-      module: "12 Concurrency Control",
-      source: "slides 1-77",
+      module: "Concurrency Control",
+      source: "Concurrency Control",
       facts: [
         ["Isolation levels", "The listed isolation levels include read uncommitted, read committed, repeatable read, snapshot isolation, and serializable.", "Treating snapshot isolation as the same as serializable", "Hard"],
         ["Lock compatibility", "Shared locks are compatible with shared locks, but exclusive locks conflict with shared and exclusive locks.", "Allowing S and X on the same object for different transactions", "Easy"],
@@ -151,8 +151,8 @@
       ]
     },
     {
-      module: "13 Crash Recovery",
-      source: "slides 1-32",
+      module: "Crash Recovery",
+      source: "Crash Recovery",
       facts: [
         ["Recovery goal", "Recovery guarantees atomicity and durability after aborts and crashes.", "Using recovery to enforce isolation between live transactions", "Medium"],
         ["STEAL", "STEAL allows flushing pages dirtied by uncommitted transactions, so UNDO information is required.", "Thinking STEAL makes atomicity trivial", "Hard"],
@@ -188,19 +188,19 @@
     {
       pick: "a",
       make: (f) => ({
-        prompt: `Which statement is the trap-free version of the CS448 rule about ${f[0]}?`,
+        prompt: `Which statement about ${f[0]} is correct?`,
         choices: {
           a: f[1],
           b: f[2],
-          c: `The optimizer can ignore ${f[0]} whenever the logical algebra expression is equivalent.`,
-          d: `${f[0]} is only relevant for main-memory execution and not for disk-backed DBMSs.`
+          c: `Logical equivalence alone makes all physical choices for ${f[0]} interchangeable.`,
+          d: `${f[0]} can be evaluated without considering I/O cost, state, or correctness conditions.`
         }
       })
     },
     {
       pick: "c",
       make: (f) => ({
-        prompt: `For ${f[0]}, consider:\n\ni. ${f[1]}\nii. ${f[2]}\niii. The detail affects correctness or I/O cost in the module 09+ slides.\niv. The detail can always be deferred to the final projection with no cost/correctness impact.\n\nWhich are correct?`,
+        prompt: `For ${f[0]}, consider:\n\ni. ${f[1]}\nii. ${f[2]}\niii. The detail affects correctness or I/O cost.\niv. The detail can always be deferred to the final projection with no cost/correctness impact.\n\nWhich are correct?`,
         choices: {
           a: "i only",
           b: "i and ii only",
@@ -212,11 +212,11 @@
     {
       pick: "b",
       make: (f) => ({
-        prompt: `A final asks you to choose a plan/rule involving ${f[0]}. What should make you suspicious?`,
+        prompt: `A query plan or transaction/recovery rule involving ${f[0]} is proposed. Which statement is the red flag?`,
         choices: {
           a: f[1],
           b: f[2],
-          c: "The answer mentions page I/O, state, timestamps, locks, or log records where the slides use them.",
+          c: "The answer accounts for page I/O, iterator state, timestamps, locks, or log records when those details determine the outcome.",
           d: "The answer distinguishes logical algebra from physical execution."
         }
       })
@@ -224,10 +224,10 @@
     {
       pick: "d",
       make: (f) => ({
-        prompt: `Which answer best explains why ${f[0]} is exam-dangerous?`,
+        prompt: `Which answer best captures the important distinction for ${f[0]}?`,
         choices: {
-          a: "The topic is mostly notation, so equivalent-looking answers are interchangeable.",
-          b: "The course treats it as implementation-free theory with no cost or state consequences.",
+          a: "Equivalent-looking logical expressions always have the same runtime behavior.",
+          b: "The implementation details can be ignored once the correct logical result is known.",
           c: f[2],
           d: `${f[1]} The common wrong move is: ${f[2]}.`
         }
@@ -236,7 +236,7 @@
     {
       pick: "a",
       make: (f) => ({
-        prompt: `Pick the statement that would survive a picky CS448 grading rubric for ${f[0]}.`,
+        prompt: `Pick the most precise statement about ${f[0]}.`,
         choices: {
           a: f[1],
           b: f[1].replaceAll("must", "may").replaceAll("requires", "suggests"),
@@ -248,7 +248,7 @@
     {
       pick: "c",
       make: (f) => ({
-        prompt: `For ${f[0]}, which combination is right?\n\ni. The slide-level rule: ${f[1]}\nii. The tempting mistake: ${f[2]}\niii. The tempting mistake should be rejected.\niv. The tempting mistake is equivalent under all physical plans.\n\nChoose one.`,
+        prompt: `For ${f[0]}, which combination is right?\n\ni. ${f[1]}\nii. ${f[2]}\niii. Statement ii should be rejected.\niv. Statement ii is equivalent under all physical plans or schedules.\n\nChoose one.`,
         choices: {
           a: "i and ii only",
           b: "ii and iv only",
@@ -261,8 +261,8 @@
 
   const special = [
     {
-      module: "09-01 Query Processing Algorithms",
-      source: "join cost slides",
+      module: "Query Processing Algorithms",
+      source: "Join cost",
       topic: "Join algorithms",
       difficulty: "Hard",
       prompt: "Given Nr=100 pages, |r|=10,000 tuples, Ns=1,000 pages. Tuple-oriented nested loops with r outer costs what?",
@@ -271,8 +271,8 @@
       explanation: "Tuple-oriented NLJ scans the inner once per outer tuple: Nr + |r|*Ns."
     },
     {
-      module: "09-01 Query Processing Algorithms",
-      source: "join cost slides",
+      module: "Query Processing Algorithms",
+      source: "Join cost",
       topic: "Join algorithms",
       difficulty: "Hard",
       prompt: "Given Nr=100, Ns=1,000, block size B=20 pages, block nested loops with r outer costs what?",
@@ -281,8 +281,8 @@
       explanation: "Block NLJ divides the outer page count by the block size: Nr + ceil(Nr/B)*Ns."
     },
     {
-      module: "10 Query Optimization",
-      source: "selectivity slides",
+      module: "Query Optimization",
+      source: "Selectivity",
       topic: "Selectivity",
       difficulty: "Hard",
       prompt: "A non-key equality predicate A=c has V(A,r)=50 distinct values. Under the uniform assumption, the selectivity is closest to:",
@@ -291,8 +291,8 @@
       explanation: "For non-key equality, estimate selectivity as 1 divided by the number of distinct values."
     },
     {
-      module: "12 Concurrency Control",
-      source: "timestamp slides",
+      module: "Concurrency Control",
+      source: "Timestamp ordering",
       topic: "Timestamp ordering",
       difficulty: "Hard",
       prompt: "TS(T)=7, RTS(O)=9, WTS(O)=4. Under basic timestamp ordering, T issues Write(O). What happens?",
@@ -301,8 +301,8 @@
       explanation: "A younger transaction already read the old value, so the older write would violate timestamp order."
     },
     {
-      module: "13 Crash Recovery",
-      source: "WAL slides",
+      module: "Crash Recovery",
+      source: "WAL",
       topic: "WAL",
       difficulty: "Hard",
       prompt: "A page has pageLSN=80 and flushedLSN=70. Can the DBMS flush that page under WAL?",
@@ -311,8 +311,8 @@
       explanation: "WAL requires pageLSN <= flushedLSN before the corresponding data page reaches disk."
     },
     {
-      module: "13 Crash Recovery",
-      source: "ARIES slides",
+      module: "Crash Recovery",
+      source: "ARIES",
       topic: "REDO",
       difficulty: "Hard",
       prompt: "During ARIES REDO, an update log record has LSN=50 for page P. P is in the dirty page table with recLSN=60. What should happen?",
@@ -350,5 +350,5 @@
 
   special.forEach((q, i) => generated.push({ ...q, id: `special-${i + 1}` }));
 
-  window.CS448_QUESTIONS = generated;
+  window.DBMS_QUESTIONS = generated;
 })();

@@ -6,12 +6,12 @@
   const sessionScore = document.querySelector("#session-score");
   const letters = ["a", "b", "c", "d"];
   const modules = [
-    "09-01 Query Processing Algorithms",
-    "09-02 Query Evaluation Pipelines",
-    "10 Query Optimization",
-    "11 Transaction Management",
-    "12 Concurrency Control",
-    "13 Crash Recovery"
+    "Query Processing Algorithms",
+    "Query Evaluation Pipelines",
+    "Query Optimization",
+    "Transaction Management",
+    "Concurrency Control",
+    "Crash Recovery"
   ];
 
   const state = {
@@ -41,7 +41,7 @@
   }
 
   function questionsForConfig(config) {
-    let pool = window.CS448_QUESTIONS || [];
+    let pool = window.DBMS_QUESTIONS || [];
     if (config.module !== "mixed") {
       pool = pool.filter((q) => q.module === config.module);
     }
@@ -54,12 +54,12 @@
   function countByModule() {
     return modules.map((module) => ({
       module,
-      count: (window.CS448_QUESTIONS || []).filter((q) => q.module === module).length
+      count: (window.DBMS_QUESTIONS || []).filter((q) => q.module === module).length
     }));
   }
 
   function updateTopStats() {
-    const total = (window.CS448_QUESTIONS || []).length;
+    const total = (window.DBMS_QUESTIONS || []).length;
     const correct = state.answers.filter((a) => a.correct).length;
     bankCount.textContent = `${total} questions`;
     sessionScore.textContent = `${correct} / ${state.answers.length}`;
@@ -81,13 +81,13 @@
         <div class="home-grid">
           <div>
             <p class="summary-line">
-              Final-style MCQ grinder built from modules 09 onward. It leans hard into the stuff that punishes fuzzy recall: costs, protocol edge cases, iterator state, selectivity, and ARIES.
+              Final-style MCQ practice for query processing, optimization, transactions, concurrency control, and recovery. It leans into the material that punishes fuzzy recall: costs, protocol edge cases, iterator state, selectivity, and ARIES.
             </p>
             <div class="module-list">${moduleRows}</div>
           </div>
           <form id="start-form" class="controls">
             <div class="field">
-              <label for="module">Module filter</label>
+              <label for="module">Topic filter</label>
               <select id="module" name="module">
                 <option value="mixed">Mixed final mode</option>
                 ${modules.map((m) => `<option value="${escapeHtml(m)}">${escapeHtml(m)}</option>`).join("")}
@@ -95,7 +95,7 @@
             </div>
             <div class="field">
               <label for="count">Question count</label>
-              <input id="count" name="count" type="number" min="5" max="${window.CS448_QUESTIONS.length}" value="40">
+              <input id="count" name="count" type="number" min="5" max="${window.DBMS_QUESTIONS.length}" value="40">
             </div>
             <label class="check-row">
               <input id="shuffle" name="shuffle" type="checkbox" checked>
@@ -112,7 +112,7 @@
       const form = new FormData(event.currentTarget);
       const config = {
         module: form.get("module"),
-        count: Math.max(5, Math.min(Number(form.get("count")) || 40, window.CS448_QUESTIONS.length)),
+        count: Math.max(5, Math.min(Number(form.get("count")) || 40, window.DBMS_QUESTIONS.length)),
         shuffle: form.get("shuffle") === "on"
       };
       startQuiz(config);
@@ -148,7 +148,6 @@
               <span class="tag hot">${escapeHtml(q.module)}</span>
               <span class="tag">${escapeHtml(q.topic)}</span>
               <span class="tag">${escapeHtml(q.difficulty)}</span>
-              <span class="tag">${escapeHtml(q.source)}</span>
             </div>
             <h2 class="prompt">${escapeHtml(q.prompt)}</h2>
           </div>
@@ -259,7 +258,7 @@
           </div>
         </div>
         <div class="mini-panel" style="margin-top:18px">
-          <h3>Module accuracy</h3>
+          <h3>Topic accuracy</h3>
           ${byModule.map((row) => `
             <div class="result-row">
               <span>${escapeHtml(row.module)}</span>
@@ -276,7 +275,7 @@
       startQuiz(state.lastConfig || { module: "mixed", count: retry.length, shuffle: true }, retry);
     });
     document.querySelector("#again").addEventListener("click", () => {
-      startQuiz({ module: "mixed", count: Math.min(40, window.CS448_QUESTIONS.length), shuffle: true });
+      startQuiz({ module: "mixed", count: Math.min(40, window.DBMS_QUESTIONS.length), shuffle: true });
     });
     document.querySelector("#home").addEventListener("click", renderHome);
   }
