@@ -60,7 +60,7 @@
       module: "Query Optimization",
       topic: "Index cost estimation",
       difficulty: "Hard",
-      prompt: "A B+-tree index has height 3. It is used for an equality predicate on a key attribute, and the index stores key-tid pairs. What cost estimate should be used to retrieve the matching tuple?",
+      prompt: "A B+-tree index lookup costs 3 index-page I/Os in the chosen cost model. The index is used for an equality predicate on a key attribute, and the index stores key-tid pairs. What cost estimate should be used to retrieve the matching tuple?",
       choices: { a: "3 I/Os", b: "4 I/Os", c: "Height plus the number of leaf pages", d: "Height times the number of duplicate values" },
       answer: "b",
       explanation: "For equality on a key with key-tid entries, cost is height plus one data-page fetch."
@@ -69,10 +69,10 @@
       module: "Query Optimization",
       topic: "Join selectivity",
       difficulty: "Hard",
-      prompt: "Orders has 100,000 tuples and Customers has 10,000 tuples. Orders.customer_id is a foreign key referencing Customers.customer_id. What is the estimated selectivity of the join?",
-      choices: { a: "1/100,000", b: "1/10,000", c: "10,000/100,000", d: "100,000 * 10,000" },
+      prompt: "Orders has 100,000 tuples and Customers has 10,000 tuples. Orders.customer_id is a foreign key referencing Customers.customer_id, and every order has a matching customer. What is the estimated output cardinality of the join?",
+      choices: { a: "10,000 tuples", b: "100,000 tuples", c: "1,000,000 tuples", d: "1,000,000,000 tuples" },
       answer: "b",
-      explanation: "For a foreign-key/primary-key join, selectivity is about 1 divided by the referenced table size."
+      explanation: "For a foreign-key/primary-key join with referential integrity, each referencing row matches one referenced row, so the output is about the size of Orders."
     },
     {
       module: "Query Optimization",
@@ -96,7 +96,7 @@
       module: "Transaction Management",
       topic: "Serializable schedules",
       difficulty: "Medium",
-      prompt: "Two concurrent transactions produce an interleaved schedule whose final database state matches running T2 completely before T1. How should this schedule be classified?",
+      prompt: "Two concurrent transactions produce an interleaved schedule whose reads and writes have the same effect as running T2 completely before T1. How should this schedule be classified?",
       choices: { a: "Serializable", b: "Dirty", c: "Unrecoverable by definition", d: "Non-isolated by definition" },
       answer: "a",
       explanation: "A schedule is serializable if it is equivalent to some serial execution."
