@@ -178,6 +178,7 @@
   function randomizeChoices(question) {
     const order = shuffle(letters);
     const choices = {};
+    const wrongExplanations = question.wrongExplanations ? {} : undefined;
     let answer = question.answer;
     order.forEach((sourceLetter, index) => {
       const targetLetter = letters[index];
@@ -185,11 +186,15 @@
       if (question.answer === sourceLetter) {
         answer = targetLetter;
       }
+      if (wrongExplanations && question.wrongExplanations[sourceLetter]) {
+        wrongExplanations[targetLetter] = question.wrongExplanations[sourceLetter];
+      }
     });
     return {
       ...question,
       choices,
-      answer
+      answer,
+      ...(wrongExplanations ? { wrongExplanations } : {})
     };
   }
 
@@ -344,9 +349,13 @@
 
   function renderFeedback(q, chosen) {
     const correct = chosen === q.answer;
+    const wrongExplanation = !correct && q.wrongExplanations?.[chosen]
+      ? `<p class="answer-note"><strong>Why ${chosen.toUpperCase()} is wrong:</strong> ${escapeHtml(q.wrongExplanations[chosen])}</p>`
+      : "";
     return `
       <div class="feedback ${correct ? "good" : "bad"}">
         <strong>${correct ? "Correct." : `Nope. Correct answer: ${q.answer.toUpperCase()}.`}</strong>
+        ${wrongExplanation}
         <p class="muted">${escapeHtml(q.explanation)}</p>
         <div class="actions">
           <button id="next-question" class="primary" type="button">${state.index + 1 === state.questions.length ? "Finish" : "Next"}</button>
@@ -480,12 +489,25 @@
     document.querySelector("#home").addEventListener("click", renderHome);
   }
 
+  function isTextEntryTarget(target) {
+    if (!(target instanceof Element)) return false;
+    return Boolean(target.closest("input, textarea, select, [contenteditable='true']"));
+  }
+
   document.addEventListener("keydown", (event) => {
     const key = event.key.toLowerCase();
-    if (letters.includes(key) && state.questions.length && state.selected === null) {
+    if (
+      letters.includes(key) &&
+      state.questions.length &&
+      state.selected === null &&
+      !event.metaKey &&
+      !event.ctrlKey &&
+      !event.altKey &&
+      !isTextEntryTarget(event.target)
+    ) {
       answerQuestion(key);
     }
-    if (event.key === "Enter") {
+    if (event.key === "Enter" && !isTextEntryTarget(event.target)) {
       const next = document.querySelector("#next-question");
       if (next) next.click();
     }
