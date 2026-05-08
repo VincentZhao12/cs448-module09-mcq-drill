@@ -175,6 +175,24 @@
     return pool.slice(0, config.count);
   }
 
+  function randomizeChoices(question) {
+    const order = shuffle(letters);
+    const choices = {};
+    let answer = question.answer;
+    order.forEach((sourceLetter, index) => {
+      const targetLetter = letters[index];
+      choices[targetLetter] = question.choices[sourceLetter];
+      if (question.answer === sourceLetter) {
+        answer = targetLetter;
+      }
+    });
+    return {
+      ...question,
+      choices,
+      answer
+    };
+  }
+
   function countByModule() {
     return modules.map((module) => ({
       module,
@@ -250,7 +268,7 @@
   }
 
   function startQuiz(config, overrideQuestions) {
-    state.questions = overrideQuestions || questionsForConfig(config);
+    state.questions = (overrideQuestions || questionsForConfig(config)).map(randomizeChoices);
     state.index = 0;
     state.selected = null;
     state.answers = [];
