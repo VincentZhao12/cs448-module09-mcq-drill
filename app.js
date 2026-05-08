@@ -21,7 +21,9 @@
     leaderboardStatus: "Loading leaderboard...",
     playerId: getOrCreatePlayerId(),
     playerName: localStorage.getItem(storageKeys.playerName) || "",
-    submittedSessionKey: null
+    submittedSessionKey: null,
+    submittingSessionKey: null,
+    failedSessionKey: null
   };
 
   const leaderboardApi = {
@@ -250,6 +252,8 @@
     state.answers = [];
     state.lastConfig = config;
     state.submittedSessionKey = null;
+    state.submittingSessionKey = null;
+    state.failedSessionKey = null;
     renderQuestion();
   }
 
@@ -366,6 +370,9 @@
     const canSubmit = Boolean(state.playerName);
     const sessionKey = `${state.playerId}:${state.questions.map((q) => q.id).join("|")}:${correct}:${state.answers.length}`;
     const alreadySubmitted = state.submittedSessionKey === sessionKey;
+    const isSubmitting = state.submittingSessionKey === sessionKey;
+    const failedSubmit = state.failedSessionKey === sessionKey;
+    const submitLabel = alreadySubmitted ? "Submitted" : isSubmitting ? "Submitting..." : failedSubmit ? "Retry submit" : "Auto-submit on finish";
 
     app.innerHTML = `
       <div class="results">
@@ -374,12 +381,12 @@
             <div class="big-score">${pct}%</div>
             <p class="muted">${correct} correct out of ${state.answers.length}. ${pct >= 85 ? "That is real exam-day shape." : "Good. Now attack the misses."}</p>
             <div class="actions">
-              <button id="submit-score" class="primary" type="button" ${canSubmit && !alreadySubmitted ? "" : "disabled"}>${alreadySubmitted ? "Submitted" : "Submit score"}</button>
+              <button id="submit-score" class="primary" type="button" ${canSubmit && !alreadySubmitted && !isSubmitting ? "" : "disabled"}>${submitLabel}</button>
               <button id="retry-missed" class="primary" type="button" ${misses.length ? "" : "disabled"}>Retry missed</button>
               <button id="again" class="secondary" type="button">Fresh mixed set</button>
               <button id="home" class="ghost" type="button">Home</button>
             </div>
-            ${canSubmit ? "" : `<p class="muted">Add your name on the home screen before submitting to the leaderboard.</p>`}
+            ${canSubmit ? `<p class="muted">Scores submit automatically when a practice set ends.</p>` : `<p class="muted">Add your name on the home screen before starting if you want this result on the leaderboard.</p>`}
           </div>
           <div class="mini-panel">
             <h3>Weak spots</h3>
@@ -401,10 +408,15 @@
       </div>
     `;
 
-    document.querySelector("#submit-score").addEventListener("click", async (event) => {
-      const button = event.currentTarget;
-      button.disabled = true;
-      button.textContent = "Submitting...";
+    const submitCurrentScore = async () => {
+      if (!canSubmit || state.submittedSessionKey === sessionKey || state.submittingSessionKey === sessionKey) return;
+      state.submittingSessionKey = sessionKey;
+      state.failedSessionKey = null;
+      const submitButton = document.querySelector("#submit-score");
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = "Submitting...";
+      }
       const entry = {
         player_id: state.playerId,
         player_name: state.playerName,
@@ -417,16 +429,24 @@
       try {
         await leaderboardApi.submit(entry);
         state.submittedSessionKey = sessionKey;
+        state.submittingSessionKey = null;
+        state.failedSessionKey = null;
         await refreshLeaderboard();
-        button.textContent = "Submitted";
         renderResults();
       } catch (error) {
-        button.textContent = "Try again";
-        button.disabled = false;
+        state.submittingSessionKey = null;
+        state.failedSessionKey = sessionKey;
         state.leaderboardStatus = `Submit failed: ${error.message.slice(0, 120)}`;
         renderResults();
       }
+    };
+
+    document.querySelector("#submit-score").addEventListener("click", () => {
+      submitCurrentScore();
     });
+    if (canSubmit && !alreadySubmitted && !isSubmitting && !failedSubmit) {
+      setTimeout(submitCurrentScore, 0);
+    }
     document.querySelector("#retry-missed").addEventListener("click", () => {
       const missedIds = new Set(misses.map((m) => m.id));
       const retry = state.questions.filter((q) => missedIds.has(q.id));
