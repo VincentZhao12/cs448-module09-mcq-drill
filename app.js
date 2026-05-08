@@ -11,6 +11,15 @@
     playerName: "cs448.playerName",
     localScores: "cs448.localScores"
   };
+  const modules = [
+    "Query Processing Algorithms",
+    "Query Evaluation Pipelines",
+    "Query Optimization",
+    "Transaction Management",
+    "Concurrency Control",
+    "Crash Recovery"
+  ];
+
   const state = {
     questions: [],
     index: 0,
@@ -166,13 +175,8 @@
     return pool.slice(0, config.count);
   }
 
-  function modules() {
-    return [...new Set((window.DBMS_QUESTIONS || []).map((q) => q.module))]
-      .sort((a, b) => a.localeCompare(b));
-  }
-
   function countByModule() {
-    return modules().map((module) => ({
+    return modules.map((module) => ({
       module,
       count: (window.DBMS_QUESTIONS || []).filter((q) => q.module === module).length
     }));
@@ -215,7 +219,7 @@
               <label for="module">Topic filter</label>
               <select id="module" name="module">
                 <option value="mixed">Mixed final mode</option>
-                ${modules().map((m) => `<option value="${escapeHtml(m)}">${escapeHtml(m)}</option>`).join("")}
+                ${modules.map((m) => `<option value="${escapeHtml(m)}">${escapeHtml(m)}</option>`).join("")}
               </select>
             </div>
             <div class="field">
@@ -352,7 +356,7 @@
     updateTopStats();
     const correct = state.answers.filter((a) => a.correct).length;
     const pct = state.answers.length ? Math.round((correct / state.answers.length) * 100) : 0;
-    const byModule = modules()
+    const byModule = modules
       .map((module) => {
         const rows = state.answers.filter((a) => a.module === module);
         const ok = rows.filter((a) => a.correct).length;
